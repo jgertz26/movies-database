@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ACTORS</title>
+</head>
+<body>
+
+<h1>All the Actors!</h1>
+
+<ul>
+  <%actors.each do |actor|%>
+  <li><a href="/actors/<%= actor['name'] %>"><%=actor['name']%></a></li>
+  <%end%>
+</ul>
+
+<a href="/actors?page=<%= page + 1 %>">MORE</a>
+
+</body>
+</html>

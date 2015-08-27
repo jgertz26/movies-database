@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%=movie["title"]%></title>
+</head>
+<body>
+
+<h1><%=movie["title"]%></h1>
+<h3>(<%=movie["year"]%>)</h3>
+
+<h4><%=movie["studio"]%></h4>
+<h4><%=movie["genre"]%></h4>
+
+<h4>Cast:<h4>
+
+<table>
+  <tr>
+    <th>Actor: </th>
+    <th>Role: </th>
+  </tr>
+
+  <%cast.each do |member|%>
+    <tr>
+      <td><a href="/actors/<%= member['actor'] %>"><%=member['actor']%></a></td>
+      <td><%=member['character']%></td>
+    </tr>
+  <%end%>
+
+</table>
+</body>
+</html>

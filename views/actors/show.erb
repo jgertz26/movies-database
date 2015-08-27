@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%=actor%></title>
+</head>
+<body>
+
+<h1><%=actor%></h1>
+
+<table>
+  <tr>
+    <th>Movie Starred In:</th>
+    <th>Role</th>
+    <th>Year</th>
+  </tr>
+  <%roles.each do |role|%>
+  <tr>
+    <td><a href="#"><%=role['title']%></a></td>
+    <td><%=role['character']%></td>
+    <td><%=role['year']%></td>
+  </tr>
+  <%end%>
+</table>
+</body>
+</html>

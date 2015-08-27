@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>MOVIES</title>
+</head>
+<body>
+
+<h1>All the Movies!</h1>
+
+<table>
+  <tr>
+    <th><a href="/movies?order=movies.title">Title:</a></th>
+    <th><a href="/movies?order=movies.year">Year:</a></th>
+    <th><a href="/movies?order=movies.rating">Rating:</a></th>
+    <th><a href="/movies?order=genres.name">Genre:</a></th>
+    <th><a href="/movies?order=studios.name">Studio:</a></th>
+  </tr>
+  <%movies.each do |movie|%>
+  <tr>
+    <td><a href="/movies/<%= movie['title'] %>"><%=movie['title']%></a></td>
+    <td><%=movie['year']%></td>
+    <td><%=movie['rating']%></td>
+    <td><%=movie['genre']%></a></td>
+    <td><%=movie['studio']%></td>
+  </tr>
+  <%end%>
+</table>
+</body>
+</html>
