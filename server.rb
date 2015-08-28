@@ -31,7 +31,6 @@ end
 
 get '/actors' do
   page = params["page"].to_i
-  binding.pry
   if page == 0
     page = 1
     start = 0
@@ -39,9 +38,11 @@ get '/actors' do
     start = (page.to_i - 1) * 100
   end
 
+  total_actors = db_connection { |conn| conn.exec("SELECT count(*) FROM actors")[0]['count'].to_i }
+  last_page = (total_actors / 100) + 1
   sql = "SELECT name FROM actors ORDER BY name OFFSET #{start} ROWS FETCH NEXT 100 ROWS ONLY"
   actors = db_connection { |conn| conn.exec(sql).to_a }
-  erb :'actors/index', locals: {actors: actors, page: page}
+  erb :'actors/index', locals: {actors: actors, page: page, last_page: last_page}
 end
 
 get '/actors/:id' do
@@ -58,33 +59,47 @@ get '/actors/:id' do
 end
 
 get '/movies' do
+  page = params["page"].to_i
+  if page == 0
+    page = 1
+    start = 0
+  else
+    start = (page.to_i - 1) * 100
+  end
+
+  total_movies = db_connection { |conn| conn.exec("SELECT count(*) FROM movies")[0]['count'].to_i }
+  last_page = (total_movies / 100) + 1
+
   order_by = params["order"]
+  search = session[:search]
   if order_by.nil?
     order_by = "movies.title"
     session[:direction] = "ASC"
   end
-  if session[:sort_item] == order_by
-    session[:direction] = flip(session[:direction])
-  else
-    session[:direction] = "ASC"
-  end
 
-  sql = "SELECT movies.title, movies.year, movies.rating, genres.name AS genre, studios.name AS studio
+  sql = "SELECT movies.id, movies.title, movies.year,
+         movies.rating, genres.name AS genre, studios.name AS studio
          FROM movies
          JOIN genres
          ON movies.genre_id = genres.id
          JOIN studios
-         ON movies.studio_id = studios.id
-         ORDER BY #{order_by} #{session[:direction]}"
-
+         ON movies.studio_id = studios.id"
+  if search.nil?
+    sql.concat(" ORDER BY #{order_by} #{session[:direction]}
+                 OFFSET #{start} ROWS FETCH NEXT 100 ROWS ONLY")
+  else
+    sql.concat(" WHERE movies.title ILIKE '%#{search}%' ORDER BY movies.title ")
+  end
+  
   movies = db_connection { |conn| conn.exec(sql).to_a }
   session[:sort_item] = order_by
-  erb :'movies/index', locals: {movies: movies}
+  session[:search] = nil
+  erb :'movies/index', locals: {movies: movies, search: search, page: page, last_page: last_page}
 end
 
 get '/movies/:id' do
-  movie = params["id"]
-  movie_id = db_connection { |conn| conn.exec("SELECT id FROM movies WHERE title='#{movie}'")[0]['id'] }
+
+  movie_id = params["id"]
   sql = "SELECT movies.title, movies.year, genres.name AS genre, studios.name AS studio
          FROM movies
          JOIN genres
@@ -102,4 +117,9 @@ get '/movies/:id' do
           WHERE movies.id='#{movie_id}'"
    cast = db_connection { |conn| conn.exec(sql).to_a }
   erb :'movies/show', locals: {movie: movie_info, cast: cast}
+end
+
+post '/movies' do
+  session[:search] = params["search"]
+  redirect "/movies"
 end

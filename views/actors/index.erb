@@ -12,8 +12,13 @@
   <li><a href="/actors/<%= actor['name'] %>"><%=actor['name']%></a></li>
   <%end%>
 </ul>
+<%unless page == 1%>
+<a href="/actors?page=<%= page - 1 %>">PREVIOUS PAGE</a>
+<%end%>
 
-<a href="/actors?page=<%= page + 1 %>">MORE</a>
+<%unless page >= last_page%>
+<a href="/actors?page=<%= page + 1 %>">NEXT PAGE</a>
+<%end%>
 
 </body>
 </html>

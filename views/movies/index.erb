@@ -5,7 +5,15 @@
 </head>
 <body>
 
+
 <h1>All the Movies!</h1>
+
+  <form action="/movies" method="post">
+    <input type="text" name="search"/>
+    <input type="submit" value="Search Movies!"/>
+  </form>
+
+<br>
 
 <table>
   <tr>
@@ -17,13 +25,26 @@
   </tr>
   <%movies.each do |movie|%>
   <tr>
-    <td><a href="/movies/<%= movie['title'] %>"><%=movie['title']%></a></td>
+    <td><a href="/movies/<%= movie['id'] %>"><%=movie['title']%></a></td>
     <td><%=movie['year']%></td>
     <td><%=movie['rating']%></td>
     <td><%=movie['genre']%></a></td>
     <td><%=movie['studio']%></td>
   </tr>
   <%end%>
+
 </table>
+<br>
+  <%unless search.nil?%>
+    <a href="/movies">Back to movies</a>
+    <%end%>
+
+  <%unless page == 1 || search.nil?%>
+  <a href="/actors?page=<%= page - 1 %>">PREVIOUS PAGE</a>
+  <%end%>
+
+  <%unless page >= last_page%>
+  <a href="/actors?page=<%= page + 1 %>">NEXT PAGE</a>
+  <%end%>
 </body>
 </html>
