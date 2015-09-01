@@ -38,13 +38,5 @@
   <%unless search.nil?%>
     <a href="/movies">Back to movies</a>
     <%end%>
-
-  <%unless page == 1 || search.nil?%>
-  <a href="/actors?page=<%= page - 1 %>">PREVIOUS PAGE</a>
-  <%end%>
-
-  <%unless page >= last_page%>
-  <a href="/actors?page=<%= page + 1 %>">NEXT PAGE</a>
-  <%end%>
 </body>
 </html>

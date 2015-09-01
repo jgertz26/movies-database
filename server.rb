@@ -48,7 +48,7 @@ end
 get '/actors/:id' do
   actor = params["id"]
   actor_id = db_connection { |conn| conn.exec("SELECT id FROM actors WHERE name='#{actor}'")[0]['id'] }
-  sql = "SELECT movies.title, cast_members.character, movies.year
+  sql = "SELECT movies.id, movies.title, cast_members.character, movies.year
          FROM movies
          JOIN cast_members
          ON movies.id = cast_members.movie_id
@@ -75,6 +75,8 @@ get '/movies' do
   if order_by.nil?
     order_by = "movies.title"
     session[:direction] = "ASC"
+  elsif order_by == session[:sort_item]
+    session[:direction] = flip(session[:direction])
   end
 
   sql = "SELECT movies.id, movies.title, movies.year,
@@ -85,12 +87,11 @@ get '/movies' do
          JOIN studios
          ON movies.studio_id = studios.id"
   if search.nil?
-    sql.concat(" ORDER BY #{order_by} #{session[:direction]}
-                 OFFSET #{start} ROWS FETCH NEXT 100 ROWS ONLY")
+    sql.concat(" ORDER BY #{order_by} #{session[:direction]}")
   else
     sql.concat(" WHERE movies.title ILIKE '%#{search}%' ORDER BY movies.title ")
   end
-  
+
   movies = db_connection { |conn| conn.exec(sql).to_a }
   session[:sort_item] = order_by
   session[:search] = nil
